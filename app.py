@@ -483,5 +483,4 @@ def init_db(seed: bool = False, drop: bool = False):
 
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
