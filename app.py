@@ -411,6 +411,33 @@ def chat(user_id):
     ).order_by(Message.created_at.asc()).all()
     return render_template('chat.html', partner=partner, messages=thread)
 
+from flask import abort, redirect, url_for, flash
+from flask_login import login_required, current_user
+
+@app.route("/book/delete/<int:book_id>", methods=["POST"])
+@login_required
+def delete_book(book_id):
+    book = Book.query.get_or_404(book_id)
+
+    # 🔐 SECURITY: only owner can delete
+    if book.owner_id != current_user.id:
+        abort(403)
+
+    # 🧹 OPTIONAL: delete uploaded image file (if not default)
+    if book.image_url and "uploads/" in book.image_url:
+        try:
+            image_path = os.path.join(BASE_DIR, book.image_url)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        except Exception:
+            pass  # fail-safe; don't block delete on file issues
+
+    db.session.delete(book)
+    db.session.commit()
+
+    flash("Book deleted successfully.", "success")
+    return redirect(url_for("profile"))
+
 # ---------- DB INIT (safe for prod when seed=False and drop=False) ----------
 def init_db(seed: bool = False, drop: bool = False):
     """

@@ -47,7 +47,12 @@
 
             </select>
           </form>
-
+          <form method="POST" action="{{ url_for('delete_book', book_id=b.id) }}"
+                onsubmit="return confirm('Delete this book?');">
+            <button class="btn btn-sm btn-danger mt-2">
+              🗑 Delete
+            </button>
+          </form>
         </div>
       </div>
     </div>
