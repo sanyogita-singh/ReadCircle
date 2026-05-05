@@ -10,14 +10,29 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
+# 🔷 BASE PATH
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "instance", "app.db")
+
+# 🔷 ENSURE INSTANCE FOLDER EXISTS
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+os.makedirs(INSTANCE_DIR, exist_ok=True)
+
+# 🔷 DATABASE PATH (LOCAL)
+DB_PATH = os.path.join(INSTANCE_DIR, "app.db")
+
+# 🔷 UPLOADS
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
+# 🔷 APP INIT
 app = Flask(__name__)
 
-# 🔷 USE RAILWAY DATABASE
+# 🔷 SECRET KEY (CRITICAL)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+
+# 🔷 DATABASE CONFIG (RAILWAY + LOCAL FALLBACK)
 database_url = os.getenv("DATABASE_URL")
 
 if database_url and database_url.startswith("postgres://"):
@@ -25,10 +40,18 @@ if database_url and database_url.startswith("postgres://"):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or \
     'sqlite:///' + DB_PATH
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# 🔷 SQLALCHEMY SETTINGS
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True
+}
+
+# 🔷 FILE UPLOAD CONFIG
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# 🔷 INIT DB
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -414,8 +437,5 @@ def init_db(seed: bool = False, drop: bool = False):
     print('Database initialized with demo seed (admin only).')
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        if not os.path.exists(DB_PATH):
-            db.create_all()
-    app.run(host='127.0.0.1', port=5000, debug=True)
+with app.app_context():
+    db.create_all()
