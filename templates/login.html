@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 85vh;">
+
+  <div class="col-md-5 col-lg-4">
+
+    <div class="card border-0 shadow-lg p-4">
+
+      <!-- 🔷 HEADER -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold">Welcome Back</h2>
+        <p class="text-muted small">Login to continue exploring books</p>
+      </div>
+
+      <!-- 🔷 FORM -->
+      <form method="post">
+
+        <!-- USERNAME -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Username</label>
+          <input name="username"
+                 class="form-control form-control-lg"
+                 placeholder="Enter your username"
+                 required>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Password</label>
+          <input type="password"
+                 name="password"
+                 class="form-control form-control-lg"
+                 placeholder="Enter your password"
+                 required>
+        </div>
+
+        <!-- REMEMBER / FORGOT -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <input type="checkbox" id="remember">
+            <label for="remember" class="small text-muted">Remember me</label>
+          </div>
+          <a href="#" class="small text-decoration-none">Forgot password?</a>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="btn btn-primary w-100 btn-lg" type="submit">
+          🔐 Login
+        </button>
+
+      </form>
+
+      <!-- 🔷 FOOTER -->
+      <div class="text-center mt-4">
+        <p class="small text-muted mb-0">
+          Don't have an account?
+          <a href="{{ url_for('register') }}" class="fw-semibold text-decoration-none">
+            Sign Up
+          </a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

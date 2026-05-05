@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+
+  <!-- 🔷 HEADER -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-semibold mb-0">💬 Chat with {{ partner.display_name }}</h4>
+  </div>
+
+  <!-- 🔷 CHAT BOX -->
+  <div class="card border-0 shadow-lg">
+
+    <!-- 🔷 MESSAGES -->
+    <div id="chatBox"
+         class="card-body"
+         style="height: 65vh; overflow-y: auto; background: #f8f9fc;">
+
+      {% for m in messages %}
+      <div class="d-flex mb-3 
+        {{ 'justify-content-end' if m.sender_id == current_user.id else 'justify-content-start' }}">
+
+        <div class="message-bubble 
+          {{ 'sent' if m.sender_id == current_user.id else 'received' }}">
+
+          <div class="message-text">{{ m.text }}</div>
+          <div class="message-time">
+            {{ m.created_at.strftime('%d %b %H:%M') }}
+          </div>
+
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- 🔷 INPUT -->
+    <div class="card-footer bg-white border-0">
+
+      <form method="post" class="d-flex gap-2 align-items-center">
+
+        <input name="text"
+               class="form-control form-control-lg"
+               placeholder="Type your message..."
+               required>
+
+        <button class="btn btn-primary px-4">
+          ➤
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 🔷 STYLES -->
+<style>
+  .message-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    position: relative;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  .message-text {
+    margin-bottom: 4px;
+  }
+
+  .message-time {
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+  }
+
+  /* SENT MESSAGE */
+  .sent {
+    background: #4e73df;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  /* RECEIVED MESSAGE */
+  .received {
+    background: #e9ecef;
+    color: #333;
+    border-bottom-left-radius: 4px;
+  }
+
+  /* SCROLLBAR */
+  #chatBox::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #chatBox::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+  }
+
+  /* ANIMATION */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<!-- 🔷 AUTO SCROLL -->
+<script>
+  const chatBox = document.getElementById('chatBox');
+  chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+{% endblock %}

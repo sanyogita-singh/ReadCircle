@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 90vh;">
+
+  <div class="col-md-8 col-lg-7">
+
+    <div class="card border-0 shadow-lg p-4">
+
+      <!-- 🔷 HEADER -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold">📚 Add a New Book</h2>
+        <p class="text-muted small">
+          Share your book with the community
+        </p>
+      </div>
+
+      <!-- 🔷 FORM -->
+      <form method="post" enctype="multipart/form-data">
+
+        <div class="row g-3">
+
+          <!-- TITLE -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Book Title</label>
+            <input name="title"
+                   class="form-control form-control-lg"
+                   placeholder="Enter book title"
+                   required>
+          </div>
+
+          <!-- AUTHOR -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Author</label>
+            <input name="author"
+                   class="form-control form-control-lg"
+                   placeholder="Enter author name">
+          </div>
+
+          <!-- TYPE -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Category</label>
+            <select name="type" class="form-select form-select-lg">
+              <option>Engineering</option>
+              <option>Fiction</option>
+              <option>Non-Fiction</option>
+              <option>Business</option>
+              <option>Science</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <!-- IMAGE URL -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Cover Image URL</label>
+            <input name="image_url"
+                   id="imageUrlInput"
+                   class="form-control form-control-lg"
+                   placeholder="Paste image URL (optional)">
+          </div>
+
+          <!-- FILE UPLOAD -->
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">Upload Cover Image</label>
+            <input name="image_file"
+                   id="imageFileInput"
+                   type="file"
+                   accept=".png,.jpg,.jpeg,.gif,.webp"
+                   class="form-control">
+
+            <div class="form-text">
+              If both URL and file are provided, uploaded image will be used.
+            </div>
+          </div>
+
+          <!-- 🔷 IMAGE PREVIEW -->
+          <div class="col-md-12 text-center">
+            <img id="previewImage"
+                 src=""
+                 style="max-height: 200px; display:none; border-radius:10px; margin-top:10px;">
+          </div>
+
+          <!-- EMAIL -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Contact Email</label>
+            <input name="contact_email"
+                   type="email"
+                   class="form-control form-control-lg"
+                   placeholder="you@example.com">
+          </div>
+
+          <!-- PHONE -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Contact Phone</label>
+            <input name="contact_phone"
+                   class="form-control form-control-lg"
+                   placeholder="Enter phone number">
+          </div>
+
+        </div>
+
+        <!-- BUTTON -->
+        <button class="btn btn-success w-100 btn-lg mt-4">
+          ➕ Add Book
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 🔷 IMAGE PREVIEW SCRIPT -->
+<script>
+  const urlInput = document.getElementById('imageUrlInput');
+  const fileInput = document.getElementById('imageFileInput');
+  const preview = document.getElementById('previewImage');
+
+  // Preview from URL
+  urlInput.addEventListener('input', () => {
+    if (urlInput.value) {
+      preview.src = urlInput.value;
+      preview.style.display = 'block';
+    }
+  });
+
+  // Preview from file upload
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+    }
+  });
+</script>
+
+{% endblock %}
