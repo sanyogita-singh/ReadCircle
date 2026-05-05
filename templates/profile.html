@@ -47,8 +47,10 @@
 
             </select>
           </form>
-          <form method="POST" action="{{ url_for('delete_book', book_id=b.id) }}"
-                onsubmit="return confirm('Delete this book?');">
+          <form method="POST" action="{{ url_for('delete_book', book_id=b.id) }}">
+            {% if csrf_token %}
+              {{ csrf_token() }}
+            {% endif %}
             <button class="btn btn-sm btn-danger mt-2">
               🗑 Delete
             </button>

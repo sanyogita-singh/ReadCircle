@@ -426,7 +426,8 @@ def delete_book(book_id):
     # 🧹 OPTIONAL: delete uploaded image file (if not default)
     if book.image_url and "uploads/" in book.image_url:
         try:
-            image_path = os.path.join(BASE_DIR, book.image_url)
+            image_path = book.image_url.replace("/static/", "static/")
+            image_path = os.path.join(BASE_DIR, image_path)
             if os.path.exists(image_path):
                 os.remove(image_path)
         except Exception:
