@@ -89,14 +89,20 @@ class Book(db.Model):
     contact_phone = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    owner = db.relationship('User', backref='books')
+    owner = db.relationship(
+    'User',
+    backref=db.backref('books', cascade="all, delete")
+    )
 
 class Wishlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    book = db.relationship('Book')
+    book = db.relationship(
+    'Book',
+    backref=db.backref('wishlists', cascade="all, delete")
+    )
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -112,7 +118,10 @@ class Rating(db.Model):
     value = db.Column(db.Integer, nullable=False)  # 1–5
 
     user = db.relationship('User', backref='ratings')
-    book = db.relationship('Book', backref='ratings')
+    book = db.relationship(
+    'Book',
+    backref=db.backref('ratings', cascade="all, delete")
+    )
 
 DEFAULT_BOOK_IMAGES = {
     'Engineering': '/static/defaults/engineering.jpg',
@@ -419,24 +428,32 @@ from flask_login import login_required, current_user
 def delete_book(book_id):
     book = Book.query.get_or_404(book_id)
 
-    # 🔐 SECURITY: only owner can delete
     if book.owner_id != current_user.id:
         abort(403)
 
-    # 🧹 OPTIONAL: delete uploaded image file (if not default)
-    if book.image_url and "uploads/" in book.image_url:
-        try:
+    try:
+        # 🔷 DELETE RELATED DATA FIRST (CRITICAL)
+        Wishlist.query.filter_by(book_id=book.id).delete()
+        Rating.query.filter_by(book_id=book.id).delete()
+
+        # 🔷 SAFE IMAGE DELETE
+        if book.image_url and "uploads/" in book.image_url:
             image_path = book.image_url.replace("/static/", "static/")
             image_path = os.path.join(BASE_DIR, image_path)
+
             if os.path.exists(image_path):
                 os.remove(image_path)
-        except Exception:
-            pass  # fail-safe; don't block delete on file issues
 
-    db.session.delete(book)
-    db.session.commit()
+        db.session.delete(book)
+        db.session.commit()
 
-    flash("Book deleted successfully.", "success")
+        flash("Book deleted successfully.", "success")
+
+    except Exception as e:
+        db.session.rollback()
+        print("DELETE ERROR:", e)
+        flash("Error deleting book.", "danger")
+
     return redirect(url_for("profile"))
 
 # ---------- DB INIT (safe for prod when seed=False and drop=False) ----------
@@ -466,4 +483,5 @@ def init_db(seed: bool = False, drop: bool = False):
 
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
